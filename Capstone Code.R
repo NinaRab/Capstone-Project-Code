@@ -98,7 +98,6 @@ strains_final <- data.frame(t(data.frame(strains_final)))
 names(strains_final) <- as.character(allconditions_tran$condition)
 
 ###remove numbers from leafly$flavors and then separate each
-leafly_f_num <- as.data.frame(leafly$flavors)
 leafly$flavors <- gsub("[0-9]\\.", "", leafly$flavors)
 leafly$flavors <- sub(" ", "", leafly$flavors)
 leafly$flavors <- gsub("  ", ";", leafly$flavors)
@@ -116,15 +115,13 @@ flavs <- as.data.frame(flavs[-1])
 #execute these steps for each flavor 
 flav_list <- list() #create an empty list
 numflav <- 1
-for (i in 1:nrow(leafly_flav$name)){
-  for (j in ncol(leafly_flav[[2:4]])){
-    this_flavor <- leafly_flav[j,i]
-    this_flavor <- this_flavor[!is.na(this_flavor)]
+for (i in 1:nrow(leafly_flav)){
+  for (j in 2:4){  ## for all three flavor columns in leafly_flav
+    this_flavor <- leafly_flav[i, j]
     temp <-  rep.int(numflav, length(this_flavor))
     names(temp) <- as.character(this_flavor)
     flav_list[[leafly_flav$name[i]]] <- temp
   }
-}      
+}     
 flavors_final <- do.call(smartbind, flav_list)
-flavors_final$strains <- as.character(leafly$name)
   
