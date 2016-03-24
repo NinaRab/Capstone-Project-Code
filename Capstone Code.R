@@ -4,7 +4,7 @@ library(readxl)
 library(dplyr)
 library(tidyr)
 library(stringr)
-dataFolder <- "C:/Users/Nina/Desktop/datafoundations/Capstone Project/"
+dataFolder <- "<your file path here>"
 
 #load all the data gathered related to my capstone project
 allprices <- read_excel(paste0(dataFolder, "all_prices.xlsx"))
