@@ -1,36 +1,31 @@
-#load ggplot2, set dataFolder
+#load libraries, set dataFolder
 library(ggplot2)
 library(readxl)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(plyr)
 library(gtools)
 dataFolder <- "C:/Users/Nina/Desktop/datafoundations/Capstone Project/"
 
-#load all the data gathered related to my capstone project
+#load data gathered related to my capstone project
 allprices <- read_excel(paste0(dataFolder, "all_prices.xlsx"))
 leafly1 <- read.csv(paste0(dataFolder, "leafly_1.csv"))
 leafly1761 <- read.csv(paste0(dataFolder, "leafly_1761.csv"))
 conditions <- read.csv(paste0(dataFolder, "conditions_strains.csv"))
 conditions1 <- read.csv(paste0(dataFolder, "conditions1.csv"))
 
-#look at structure of each dataset
-str(allprices)
-str(leafly1)
-str(leafly1761)
-str(conditions)
-str(conditions1)
-
 #join leafly1 & leafly1761 and conditions & conditions1 by rows
 leafly <- as.data.frame(bind_rows(leafly1, leafly1761))
 allconditions <- as.data.frame(bind_rows(conditions, conditions1))
-
 
 #clean leafly and allconditions datasets of extraneous data
 leafly$parents_link <- NULL
 leafly$parents_link._source <- NULL
 leafly$parents._source <- NULL
 leafly$parents <- NULL
+leafly$recommendations_notes <- NULL
+leafly$grow_info <- NULL
 allconditions$pageUrl <- NULL
 allconditions$strains <- NULL
 
@@ -53,7 +48,7 @@ allconditions$strains._source <- gsub("edible", "", allconditions$strains._sourc
 leafly <- select(leafly, name, everything())
 
 #rename pageUrl to strain.type
-leafly <- rename(leafly, strain.type = pageUrl)
+leafly <- rename(leafly, replace = c("pageUrl" = "strain.type"))
 
 #save leafly$pageUrl to use for combining leafly with allconditions
 leafly$pageUrl <- leafly$strain.type
@@ -78,9 +73,7 @@ names(allconditions) <- as.vector(allconditions_tran$condition)
 #remove first row from allconditions (since it is really the label for each column)
 allconditions <- allconditions[-1,]
 
-#create a vector of 1, and a vector of the number of strains for each condition
 numStrains <- 1
-
 #####one hot encoding for conditions for each strain####
 #execute these steps for each condition 
 strains <- list() #create an empty list
@@ -101,7 +94,6 @@ strains_final <- data.frame(do.call(smartbind, strains))
 strains_final <- data.frame(t(data.frame(strains_final)))
 names(strains_final) <- as.character(allconditions_tran$condition)
 strains_final$pageUrl <- row.names(strains_final)#add strain names to new column in strains_final
-
 
 ######get leafly$flavors data in order for one-hot encoding###
 ###remove numbers from leafly$flavors and then separate each
@@ -124,114 +116,258 @@ for (i in 1:nrow(leafly)){
   names(temp) <- as.character(this_flavor)
   flav_list[[leafly$name[i]]] <- temp
 }     
-flavors_final <- do.call(smartbind, flav_list)
+flavors_final <- data.frame(do.call(smartbind, flav_list))
+
+#removes columnsnamed NA
+flavors_final$NA. <- NULL
+flavors_final[is.na(flavors_final)] <- 0
+
+#merge flavors_final$minty and flavors_final$mint (since it's the same thing)
+flavors_final$mint <- flavors_final$Minty + flavors_final$Mint
+flavors_final$Mint <- NULL
+flavors_final$Minty <- NULL
+
+#add flavors_final$name to full join it with leafly
 flavors_final$name <- row.names(flavors_final)
+colnames(flavors_final) <- paste("flvr", colnames(flavors_final), sep = "_")
+flavors_final <- rename(flavors_final, replace = c("flvr_name" = "name"))
+leafly <- full_join(leafly, flavors_final, by = "name")
+
+#####
 
 ######get negatives data in order for one-hot encoding#####
 negatives <- read.csv(paste0(dataFolder, "negatives.csv"))
 
-#separate negatives into separate columns (instead of parsing based on words)
-negatives <- select(negatives, 1:2) %>% separate(negatives, c("neg_1", "neg_2", "neg_3", "neg_4", "neg_5"), sep = ";")
+#select relevant columns (instead of parsing based on words)
+negatives <- select(negatives, 1:2)
 
-#combine negatives with leafly data
+#combine negatives with leafly data 
+#(to make sure strain names match up with their own negatives)
 leafly <- full_join(leafly, negatives, by = "name")
+leafly <- distinct(leafly)
+
+#separate and parse leafly$negatives so each negative is in its own column (in a new data frame)
+leafly$negatives <- gsub(" ", "", leafly$negatives)
+leafly_neg <- select(leafly, 1,57) %>% separate(negatives, c("neg_1", "neg_2", "neg_3", "neg_4", "neg_5"), sep = (";"))
 
 #encode blank values as NA
-leafly$neg_1[leafly$neg_1==""] <- NA
+leafly_neg$neg_1[leafly_neg$neg_1==""] <- NA
 
-#create a transposed data frame (t_negatives) to use for encoding
-S_negatives <- select(leafly, 1, 11:15)
-t_negatives <- as.data.frame(t(S_negatives))
-names(t_negatives) <- as.character(leafly$name)
-t_negatives <- t_negatives[-1,]
+#create a transposed data frame (t_leafly_neg) to use for encoding
+t_leafly_neg <- as.data.frame(t(leafly_neg))
+names(t_leafly_neg) <- as.character(leafly$name)
+t_leafly_neg <- t_leafly_neg[-1,]
 
 ####one-hot encoding for negatives####
 negative_list <- list()
 numNeg <- 1
 for (i in 1:nrow(leafly)){
-  this_neg <- unique(t_negatives[,i])
-  this_neg <- this_neg[!is.na(this_neg)]
+  this_neg <- t_leafly_neg[,i]
   temp <- rep.int(numNeg, length(this_neg))
   names(temp) <- as.character(this_neg)
+  temp <- data.frame(t(temp))
   negative_list[[leafly$name[i]]] <- temp
 }
 
-negs_final <- do.call(smartbind, negative_list)
+negs_final <- data.frame(do.call(smartbind, negative_list))
 negs_final$name <- row.names(negs_final)
 
-#####get effects_only data ready for one-hot encoding####
-effects_only <- read.csv(paste0(dataFolder, "effects_only.csv"))
-effects_only <- select(effects_only, 1:2) %>% separate(effects, c("e1", "e2", "e3", "e4", "e5"), sep = ";")
-leafly <- full_join(leafly, effects_only, by = "name")
-leafly$e1[leafly$e1==""] <- NA
-s_effect <- select (leafly, 1, 16:20)
-t_effects <- as.data.frame(t(s_effect))
-names(t_effects) <- as.character(s_effect$name)
-t_effects <- t_effects[-1,]
+#change NA's in negs_final to O
+negs_final[is.na(negs_final)] <- 0
 
-####one-hot encoding for effects_only####
-fx_list <- list() #create an empty list
+#remove columns named NA
+negs_final$NA. <- NULL
+negs_final$NA..1 <- NULL
+negs_final$NA..2 <- NULL
+negs_final$NA..3 <- NULL
+negs_final$NA..4 <- NULL
+
+#add neg_ to each column name in negs_final 
+#(to be able to differentiate between negatives and other categories)
+colnames(negs_final) <- paste("neg", colnames(negs_final), sep = "_")
+
+#full join negs_final with leafly again
+negs_final <- rename(negs_final, replace = c("neg_name" = "name"))
+leafly <- full_join(leafly, negs_final, by = "name")
+
+#remove leafly columns which have already been encoded
+leafly$flavors <- NULL
+leafly$negatives <- NULL
+leafly <- distinct(leafly) 
+
+#######
+
+effects <- read.csv(paste0(dataFolder, "effects_only.csv"))
+
+#select relevant columns (instead of parsing based on words)
+effects <- select(effects, 1:2)
+
+#combine effects with leafly data 
+#(to make sure strain names match up with their own effects)
+leafly <- full_join(leafly, effects, by = "name")
+leafly <- distinct(leafly)
+
+#separate and parse leafly$effects so each effect is in its own column (in a new data frame)
+leafly$effects <- gsub(" ", ".", leafly$effects)
+leafly_fx <- select(leafly, 1,62) %>% separate(effects, c("fx_1", "fx_2", "fx_3", "fx_4", "fx_5"), sep = (";."))
+
+#encode blank values as NA
+leafly_fx$fx_1[leafly_fx$fx_1==""] <- NA
+
+#create a transposed data frame (t_leafly_fx) to use for encoding
+t_leafly_fx <- as.data.frame(t(leafly_fx))
+names(t_leafly_fx) <- as.character(leafly$name)
+t_leafly_fx <- t_leafly_fx[-1,]
+
+####one-hot encoding for effects####
+fx_list <- list()
 numfx <- 1
 for (i in 1:nrow(leafly)){
-  this_effect <- unique(t_effects[ ,i])
-  temp <-  rep.int(numfx, length(this_effect))
-  names(temp) <- as.character(this_effect)
+  this_fx <- t_leafly_fx[,i]
+  temp <- rep.int(numfx, length(this_fx))
+  names(temp) <- as.character(this_fx)
+  temp <- data.frame(t(temp))
   fx_list[[leafly$name[i]]] <- temp
-}     
-fx_final <- do.call(smartbind, fx_list)
+}
+
+fx_final <- data.frame(do.call(smartbind, fx_list))
 fx_final$name <- row.names(fx_final)
 
-######
+#change NA's in fx_final to 0
+fx_final[is.na(fx_final)] <- 0
+
+#remove columns named NA
+fx_final$NA. <- NULL
+fx_final$NA..1 <- NULL
+fx_final$NA..2 <- NULL
+fx_final$NA..3 <- NULL
+fx_final$NA..4 <- NULL
+
+#add fx_ to each column name in fx_final 
+#(to be able to differentiate between negatives and other categories)
+colnames(fx_final) <- paste("fx", colnames(fx_final), sep = "_")
+
+#full join fx_final with leafly again
+fx_final <- rename(fx_final, replace = c("fx_name" = "name"))
+leafly <- full_join(leafly, fx_final, by = "name")
+
+#remove leafly columns which have already been encoded
+leafly$effects <- NULL
+leafly <- distinct(leafly) 
+#####
 
 #####get medical data ready for one-hot encoding
 medical <- read.csv(paste0(dataFolder, "medical.csv"))
-medical <- select(medical, 1:2) %>% separate(medical, c("m1", "m2", "m3", "m4", "m5"), sep = ";")
-leafly <- full_join(leafly, medical, by = "name")
-leafly$m1[leafly$m1==""] <- NA
-S_medical <- select(leafly, 1, 21:25)
-t_medical <- as.data.frame(t(S_medical))
-names(t_medical) <- as.character(leafly$name)
-t_medical <- t_medical[-1,]
 
-####one-hot encoding for effects_only####
-med_list <- list() #create an empty list
+#select relevant columns (instead of parsing based on words)
+medical <- select(medical, 1:2)
+
+#combine medical with leafly data 
+#(to make sure strain names match up with their own medical conditions)
+leafly <- full_join(leafly, medical, by = "name")
+leafly <- distinct(leafly)
+
+#separate and parse leafly$medical so each medical condition is in its own column (in a new data frame)
+leafly$medical <- gsub(" ", "", leafly$medical)
+leafly_med <- select(leafly, 1,89) %>% separate(medical, c("med_1", "med_2", "med_3", "med_4", "med_5"), sep = (";"))
+
+#encode blank values as NA
+leafly_med$med_1[leafly_med$med_1==""] <- NA
+
+#create a transposed data frame (t_leafly_med) to use for encoding
+t_leafly_med <- as.data.frame(t(leafly_med))
+names(t_leafly_med) <- as.character(leafly$name)
+t_leafly_med <- t_leafly_med[-1,]
+
+####one-hot encoding for medical####
+med_list <- list()
 nummed <- 1
 for (i in 1:nrow(leafly)){
-  this_med <- t_medical[,i]
-  temp <-  rep.int(nummed, length(this_med))
+  this_med <- t_leafly_med[,i]
+  temp <- rep.int(nummed, length(this_med))
   names(temp) <- as.character(this_med)
+  temp <- data.frame(t(temp))
   med_list[[leafly$name[i]]] <- temp
-}     
-med_final <- do.call(smartbind, med_list)
+}
+
+med_final <- data.frame(do.call(smartbind, med_list))
 med_final$name <- row.names(med_final)
+
+#change NA's in med_final to O
+med_final[is.na(med_final)] <- 0
+
+#remove columns named NA
+med_final$NA. <- NULL
+med_final$NA..1 <- NULL
+med_final$NA..2 <- NULL
+med_final$NA..3 <- NULL
+med_final$NA..4 <- NULL
+
+#add med_ to each column name in med_final 
+#(to be able to differentiate between negatives and other categories)
+colnames(med_final) <- paste("med", colnames(med_final), sep = "_")
+
+med_final <- rename(med_final, replace = c("med_name" = "name"))
+#full join med_final with leafly again
+leafly <- full_join(leafly, med_final, by = "name")
+
+#remove leafly columns which have already been encoded
+leafly$medical <- NULL
+leafly <- distinct(leafly) 
 
 ######
 
 #### get leafly$parents data ready for one-hot encoding####
-parents <- select(leafly, 1, 7) %>% separate(parents._alt, c("p1", "p2", "p3", "p4", "p5", "p6", "p7"), sep = ";")
-leafly <- full_join(leafly, parents, by = "name")
-leafly$p1[leafly$p1==""] <- NA
-leafly <- distinct(leafly)
-s_parents <- select(leafly, 1, 26:32)
-t_parents <- as.data.frame(t(s_parents))
-names(t_parents) <- as.character(leafly$name)
-t_parents <- t_parents[-1, ]
+parents <- select(leafly, 1, 6) %>% separate(parents._alt, c("p1", "p2", "p3", "p4", "p5", "p6", "p7"), sep = "; ")
+#encode blank values as NA
+parents$p1[parents$p1==""] <- NA
 
-####one-hot encoding for leafly$parents data####
-par_list <- list()
+#create a transposed data frame (t_parents) to use for encoding
+t_parents <- as.data.frame(t(parents))
+names(t_parents) <- as.character(leafly$name)
+t_parents <- t_parents[-1,]
+
+####one-hot encoding for parents####
+parent_list <- list()
 numpar <- 1
 for (i in 1:nrow(leafly)){
-  this_par <- t_parents[,i]
-  temp <- rep.int(numpar, length(this_par))
-  names(temp) <- as.character(this_par)
-  par_list[[leafly$name[i]]] <- temp
+  this_parent <- t_parents[,i]
+  temp <- rep.int(numpar, length(this_parent))
+  names(temp) <- as.character(this_parent)
+  temp <- data.frame(t(temp))
+  parent_list[[leafly$name[i]]] <- temp
 }
-par_final <- do.call(smartbind, par_list)
-par_final$name <- row.names(par_final)
+
+parent_final <- data.frame(do.call(smartbind, parent_list))
+parent_final$name <- row.names(parent_final)
+
+#change NA's in parent_final to O
+parent_final[is.na(parent_final)] <- 0
+
+#remove columns named NA
+parent_final$NA. <- NULL
+parent_final$NA..1 <- NULL
+parent_final$NA..2 <- NULL
+parent_final$NA..3 <- NULL
+parent_final$NA..4 <- NULL
+parent_final$NA..5 <- NULL
+parent_final$NA..6 <- NULL
+
+#add prnts_ to each column name in parent_final 
+#(to be able to differentiate between negatives and other categories)
+colnames(parent_final) <- paste("prnts", colnames(parent_final), sep = "_")
+
+parent_final <- rename(parent_final, replace = c("prnt_name" = "name"))
+#full join parent_final with leafly again
+leafly <- full_join(leafly, parent_final, by = "name")
+
+#remove leafly columns which have already been encoded
+leafly$parents._alt <- NULL
+leafly <- distinct(leafly) 
 ######
 
 ####get leafly$strain.type ready for one-hot encoding and encode
-strain_type <- as.data.frame(select(leafly, 1, 8))
+strain_type <- as.data.frame(select(leafly, 1, 6))
 strain_type$strain.type <- tolower(as.character(strain_type$strain.type))
 type_list <- list()
 numtype <- 1
@@ -241,50 +377,109 @@ for (i in 1:nrow(leafly)){
   names(temp) <- as.character(this_type)
   type_list[[leafly$name[i]]] <- temp
 }
-type_final <- do.call(smartbind, type_list)
+type_final <- data.frame(do.call(smartbind, type_list))
 type_final$name <- row.names(type_final)
 
+#remove columns named NA
+type_final$NA. <- NULL
+
+#add type_ to each column name in type_final 
+#(to be able to differentiate between negatives and other categories)
+colnames(type_final) <- paste("type", colnames(type_final), sep = "_")
+
+type_final <- rename(type_final, replace = c("type_name" = "name"))
+#full join type_final with leafly again
+leafly <- full_join(leafly, type_final, by = "name")
+
+#remove leafly columns which have already been encoded
+leafly$strain.type <- NULL
+leafly <- distinct(leafly)
+
 ####get leafly$most_popular_in data ready for one-hot encoding####
-pop_locations <- select(leafly, 1, 6)
+pop_locations <- select(leafly, 1, 5)
 pop_locations$most_popular_in <- gsub(",Spain", ",SP", pop_locations$most_popular_in)
 pop_locations$most_popular_in <- gsub(",Netherlands", ",NL", pop_locations$most_popular_in)
-pop_locations$most_popular_in <- gsub("[A-Z]*(\\s)", "---", pop_locations$most_popular_in)
+pop_locations$most_popular_in <- gsub("[A-Z]*(\\s)", "--", pop_locations$most_popular_in)
 pop_locations$most_popular_in <- gsub("Spain", "-", pop_locations$most_popular_in)
 pop_locations$most_popular_in <- gsub("Netherlands", "-", pop_locations$most_popular_in)
 pop_locations$most_popular_in <- gsub("[A-Z]{2}", "-", pop_locations$most_popular_in)
 pop_locations$most_popular_in <- gsub("\\;\\-", "\\,\\-", pop_locations$most_popular_in)
-pop_locations <- separate(pop_locations, most_popular_in, c("l1", "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9", "l10", "l11", "l12"), sep = "(\\,(\\-)+)+")
+pop_locations <- separate(pop_locations, most_popular_in, c("L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12"), sep = "(\\,(\\-)+)+")
 pop_locations[pop_locations==""] <- NA
-pop_locations[['l12']] <- NULL
-pop_locations[['l11']] <- NULL
+pop_locations[['L12']] <- NULL
+pop_locations[['L11']] <- NULL
 
-leafly <- full_join(leafly, pop_locations, by = "name")
-leafly <- distinct(leafly)
-s_locations <- select(leafly, 1, 33:42)
-t_locations <- as.data.frame(t(s_locations))
-names(t_locations) <- as.character(leafly$name)
-t_locations <- t_locations[-1, ]
+#create a transposed data frame (t_poploc) to use for encoding
+t_poploc <- as.data.frame(t(pop_locations))
+names(t_poploc) <- as.character(leafly$name)
+t_poploc<- t_poploc[-1,]
 
-####one-hot encoding for pop_locations data####
-loc_list <- list()
+####one-hot encoding for parents####
+poploc_list <- list()
 numloc <- 1
 for (i in 1:nrow(leafly)){
-  this_loc <- unique(t_locations[,i])
-  temp <- rep.int(numloc, length(this_loc))
-  names(temp) <- as.character(this_loc)
-  loc_list[[leafly$name[i]]] <- temp
+  this_location <- t_poploc[,i]
+  temp <- rep.int(numloc, length(this_location))
+  names(temp) <- as.character(this_location)
+  temp <- data.frame(t(temp))
+  poploc_list[[leafly$name[i]]] <- temp
 }
-loc_final <- do.call(smartbind, loc_list)
-loc_final$name <- row.names(loc_final)
+
+locations_final <- data.frame(do.call(smartbind, poploc_list))
+locations_final$name <- row.names(locations_final)
+
+#change NA's in locations_final to O
+locations_final[is.na(locations_final)] <- 0
+
+#remove columns named NA
+locations_final$NA. <- NULL
+locations_final$NA..1 <- NULL
+locations_final$NA..2 <- NULL
+locations_final$NA..3 <- NULL
+locations_final$NA..4 <- NULL
+locations_final$NA..5 <- NULL
+locations_final$NA..6 <- NULL
+locations_final$NA..7 <- NULL
+locations_final$NA..8 <- NULL
+locations_final$NA..9 <- NULL
+
+#remove duplicates (entries that had the same location more than once, which contain a digit in the name)
+locations_final <- select(locations_final, -matches("[0-9]"))
+
+#add loc_ to each column name in locations_final 
+#(to be able to differentiate between locations and other categories)
+colnames(locations_final) <- paste("loc", colnames(locations_final), sep = "_")
+
+locations_final <- rename(locations_final, replace = c("loc_name" = "name"))
+#full join locations_final with leafly 
+leafly <- full_join(leafly, locations_final, by = "name")
+
+#remove leafly columns which have already been encoded
+leafly$most_popular_in <- NULL
+leafly <- distinct(leafly)
 
 #########
-####combine all the one-hot encoded data
-leafly_OHE <- select(leafly, name, number_reviews, review, pageUrl)
-leafly_OHE <- full_join(leafly_OHE, strains_final, by = "pageUrl")
-leafly_OHE <- full_join(leafly_OHE, flavors_final, by = "name")
-leafly_OHE <- full_join(leafly_OHE, negs_final, by = "name")
-leafly_OHE <- full_join(leafly_OHE, fx_final, by = "name")
-leafly_OHE <- full_join(leafly_OHE, med_final, by = "name")
-leafly_OHE <- full_join(leafly_OHE, par_final, by = "name")
-leafly_OHE <- full_join(leafly_OHE, type_final, by = "name")
-leafly_OHE <- full_join(leafly_OHE, loc_final, by = "name")
+#paste cnd_ (for condition) to the beginning of each variable name in strains_final
+colnames(strains_final) <- paste("cnd", colnames(strains_final), sep = "_")
+
+#full join strains_final with leafly
+strains_final <- rename(strains_final, replace = c("cnd_pageUrl" = "pageUrl"))
+strains_final[is.na(strains_final)] <- 0 
+leafly <- left_join(leafly, strains_final, by = "pageUrl")
+
+#remove encoded columns
+leafly$pageUrl <- NULL
+
+#remove NA's
+leafly[is.na(leafly)] <- 0
+
+#keep NA's for missing number_reviews
+leafly$number_reviews[leafly$number_reviews==0] <- NA
+
+#remove non-unique rows
+leafly <- distinct(leafly)
+
+#create a popularity variable from number_reviews and review
+leafly$popularity <- as.numeric(leafly$number_reviews)*as.numeric(leafly$review)
+leafly$number_reviews <- NULL
+leafly$review <- NULL
