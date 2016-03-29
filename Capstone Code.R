@@ -354,10 +354,10 @@ parent_final$NA..5 <- NULL
 parent_final$NA..6 <- NULL
 
 #add prnts_ to each column name in parent_final 
-#(to be able to differentiate between negatives and other categories)
+#(to be able to differentiate between parents and other categories)
 colnames(parent_final) <- paste("prnts", colnames(parent_final), sep = "_")
 
-parent_final <- rename(parent_final, replace = c("prnt_name" = "name"))
+parent_final <- rename(parent_final, replace = c("prnts_name" = "name"))
 #full join parent_final with leafly again
 leafly <- full_join(leafly, parent_final, by = "name")
 
@@ -483,3 +483,308 @@ leafly <- distinct(leafly)
 leafly$popularity <- as.numeric(leafly$number_reviews)*as.numeric(leafly$review)
 leafly$number_reviews <- NULL
 leafly$review <- NULL
+
+#look at column names to make sure there are no duplicates in each category
+#and to merge 2 columns if necessary
+names(leafly[,order(colnames(leafly),decreasing=TRUE)])
+#since fx_Headache and fx_Headaches are similar, merge both into fx_Headaches
+leafly$fx_Headaches <- leafly$fx_Headache + leafly$fx_Headaches
+leafly$fx_Headaches
+leafly$fx_Headache <- NULL
+
+#####EDA#####
+#get summary data on leafly and save for later
+leafly_summary <- data.frame(summary(leafly))
+leafly_means <- select(leafly, -name, -strain_highlights) %>% summarise_each(funs(mean))
+
+###univariate EDA by category###
+
+#separate each category of qualities into its own data frame & get a mean value for each quality
+cnds <- select(leafly, starts_with("cnd_")) %>% summarise_each(funs(mean))
+meds <- select(leafly, starts_with("med_")) %>% summarise_each(funs(mean))
+fx <- select(leafly, starts_with("fx_")) %>% summarise_each(funs(mean))
+negs <- select(leafly, starts_with("neg_")) %>% summarise_each(funs(mean))
+locs <- select(leafly, starts_with("loc_")) %>% summarise_each(funs(mean))
+flvrs <- select(leafly, starts_with("flvr_")) %>% summarise_each(funs(mean))
+prnts <- select(leafly, starts_with("prnts_")) %>% summarise_each(funs(mean))
+
+#transpose means to be able to see more clearly
+t_negs <- data.frame(t(negs))
+names(t_negs) <- ("mean")
+t_cnds <- data.frame(t(cnds))
+names(t_cnds) <- ("mean")
+t_meds <- data.frame(t(meds))
+names(t_meds) <- ("mean")
+t_fx <- data.frame(t(fx))
+names(t_fx) <- ("mean")
+t_locs <- data.frame(t(locs))
+names(t_locs) <- ("mean")
+t_flvrs <- data.frame(t(flvrs))
+names(t_flvrs) <- ("mean")
+t_prnts <- data.frame(t(prnts))
+names(t_prnts) <- ("mean")
+
+#create data frame of leafly unencoded to be able to do graphical EDA# 
+#for a better sense of the data#
+
+#create data frame of leafly unencoded
+leafly_unenc <- as.data.frame(bind_rows(leafly1, leafly1761))
+
+leafly_unenc$parents_link <- NULL
+leafly_unenc$parents_link._source <- NULL
+leafly_unenc$parents._source <- NULL
+leafly_unenc$parents <- NULL
+leafly_unenc$recommendations_notes <- NULL
+leafly_unenc$grow_info <- NULL
+
+leafly_unenc <- distinct(leafly_unenc)
+
+leafly_unenc$number_reviews <- gsub("[0-9](\\.*?)([0-9]*?\\|)|Reviews", "", leafly_unenc$number_reviews)
+
+#reorder leafly_unenc data so strain name is first
+leafly_unenc <- select(leafly_unenc, name, everything())
+
+#rename pageUrl to strain.type
+leafly_unenc <- rename(leafly_unenc, replace = c("pageUrl" = "strain.type"))
+
+#save leafly_unenc$pageUrl to use for combining leafly with allconditions
+leafly_unenc$pageUrl <- leafly_unenc$strain.type
+leafly_unenc$pageUrl <- gsub("https://www.leafly.com/[a-z0-9-]+/", "", leafly_unenc$pageUrl)
+
+#parse leafly_unenc$strain.type to get the strain type
+leafly_unenc$strain.type <- gsub("https://www.leafly.com/|(/[a-z0-9-]+)", "", leafly_unenc$strain.type)
+
+###remove numbers from leafly_unenc$flavors and then separate each
+leafly_unenc$flavors <- gsub("[0-9]\\.", "", leafly_unenc$flavors)
+leafly_unenc$flavors <- sub(" ", "", leafly_unenc$flavors)
+leafly_unenc$flavors <- gsub("  ", ";", leafly_unenc$flavors)
+leafly__unenc_flav <- select(leafly_unenc, 1:2) %>% separate(flavors, c("flavor_1", "flavor_2", "flavor_3"), sep = (";"))
+leafly__unenc_flav$flavor_1[leafly__unenc_flav$flavor_1==""] <- NA
+
+negatives <- read.csv(paste0(dataFolder, "negatives.csv"))
+
+#select relevant columns (instead of parsing based on words)
+negatives <- select(negatives, 1:2)
+
+#separate and parse leafly$negatives so each negative is in its own column (in a new data frame)
+negatives$negatives <- gsub(" ", "", negatives$negatives)
+unenc_neg <- select(negatives, 1,2) %>% separate(negatives, c("neg_1", "neg_2", "neg_3", "neg_4", "neg_5"), sep = (";"))
+
+#encode blank values as NA
+unenc_neg$neg_1[unenc_neg$neg_1==""] <- NA
+
+effects <- read.csv(paste0(dataFolder, "effects_only.csv"))
+
+#select relevant columns (instead of parsing based on words)
+effects <- select(effects, 1:2)
+
+#separate and parse leafly$effects so each effect is in its own column (in a new data frame)
+effects$effects <- gsub(" ", ".", effects$effects)
+unenc_fx <- select(effects, 1,2) %>% separate(effects, c("fx_1", "fx_2", "fx_3", "fx_4", "fx_5"), sep = (";."))
+
+#encode blank values as NA
+unenc_fx$fx_1[unenc_fx$fx_1==""] <- NA
+
+medical <- read.csv(paste0(dataFolder, "medical.csv"))
+
+#select relevant columns (instead of parsing based on words)
+medical <- select(medical, 1:2)
+
+#separate and parse leafly$medical so each medical condition is in its own column (in a new data frame)
+medical$medical <- gsub(" ", "", medical$medical)
+unenc_med <- select(medical, 1,2) %>% separate(medical, c("med_1", "med_2", "med_3", "med_4", "med_5"), sep = (";"))
+
+#encode blank values as NA
+unenc_med$med_1[unenc_med$med_1==""] <- NA
+
+#separate parents data
+parents_unenc <- select(leafly_unenc, 1, 7) %>% separate(parents._alt, c("p1", "p2", "p3", "p4", "p5", "p6", "p7"), sep = "; ")
+#encode blank values as NA
+parents_unenc$p1[parents_unenc$p1==""] <- NA
+
+
+loc_unenc <- select(leafly_unenc, 1, 6)
+loc_unenc$most_popular_in <- gsub(",Spain", ",SP", loc_unenc$most_popular_in)
+loc_unenc$most_popular_in <- gsub(",Netherlands", ",NL", loc_unenc$most_popular_in)
+loc_unenc$most_popular_in <- gsub("[A-Z]*(\\s)", "--", loc_unenc$most_popular_in)
+loc_unenc$most_popular_in <- gsub("Spain", "-", loc_unenc$most_popular_in)
+loc_unenc$most_popular_in <- gsub("Netherlands", "-", loc_unenc$most_popular_in)
+loc_unenc$most_popular_in <- gsub("[A-Z]{2}", "-", loc_unenc$most_popular_in)
+loc_unenc$most_popular_in <- gsub("\\;\\-", "\\,\\-", loc_unenc$most_popular_in)
+loc_unenc<- separate(loc_unenc, most_popular_in, c("L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12"), sep = "(\\,(\\-)+)+")
+loc_unenc[loc_unenc==""] <- NA
+loc_unenc[['L12']] <- NULL
+
+#remove extraneous columns
+leafly_unenc$strain_highlights <- NULL
+leafly_unenc$most_popular_in <- NULL
+leafly_unenc$parents._alt <- NULL
+leafly_unenc$flavors <- NULL
+
+#prepare all conditions data for EDA
+allconditions <- as.data.frame(bind_rows(conditions, conditions1))
+#clean allconditions datasets of extraneous data
+allconditions$pageUrl <- NULL
+allconditions$strains <- NULL
+
+#remove duplicate rows
+allconditions <- distinct(allconditions)
+
+#parse allconditions data to contain succinct, relevant data
+allconditions$condition <- gsub("Cannabis Strains That Help With|Best Cannabis Strains to Relieve", "", allconditions$condition)
+allconditions$strains._source <- gsub("hybrid", "", allconditions$strains._source)
+allconditions$strains._source <- gsub("sativa", "", allconditions$strains._source)
+allconditions$strains._source <- gsub("indica", "", allconditions$strains._source)
+allconditions$strains._source <- gsub("edible", "", allconditions$strains._source)
+allconditions$strains._source <- gsub("//", "", allconditions$strains._source)
+
+#separate allcondition strains
+allconditions <- separate(allconditions, strains._source, c(1:56), sep = "; ")
+t_allconditions <- data.frame(t(allconditions))
+
+names(t_allconditions) <- as.vector(allconditions_tran$condition)
+
+#remove first row from allconditions (since it is really the label for each column)
+t_allconditions <- t_allconditions[-1,]
+
+#####one hot encoding for conditions for each strain####
+#execute these steps for each condition 
+strains <- list() #create an empty list
+for (i in 1:nrow(allconditions_tran)){
+  this_strains <- unique(t_allconditions[,i]) #remove repeat strains for each condition
+  this_strains <- this_strains[!is.na(this_strains)] #get rid of NAs
+  temp <- rep.int(allconditions_tran$condition[i], length(this_strains)) #create a vector of 1's of length = number of strains for that condition
+  names(temp) <- as.character(unique(as.character(this_strains))) #set the names of the temp vector as the names of the strains
+  temp <- t(data.frame(temp)) #transpose the temp data frame
+  strains[[allconditions_tran$condition[i]]] <- temp #save the transposed temp data frame to strains, with the column header of what condition it is
+}
+
+strains_final <- data.frame(do.call(smartbind, strains)) 
+
+for (i in 1:ncol(strains_final)){
+  strains_final[[i]][is.na(strains_final[[i]])] <- 0
+}
+
+#transpose strains_final
+t_strainsfinal <- data.frame(t(strains_final))
+t_strainsfinal$pageUrl <- rownames(t_strainsfinal)
+
+#full join the different categories with leafly_unenc by name
+leafly_unenc <- left_join(leafly_unenc, t_strainsfinal, by = "pageUrl")
+leafly_unenc <- distinct(leafly_unenc)
+leafly_unenc$pageUrl <- NULL
+leafly_unenc <- distinct(leafly_unenc)
+leafly_unenc <- left_join(leafly_unenc, unenc_neg, by = "name")
+leafly_unenc <- distinct(leafly_unenc)
+leafly_unenc <- left_join(leafly_unenc, unenc_med, by = "name")
+leafly_unenc <- distinct(leafly_unenc)
+leafly_unenc <- left_join(leafly_unenc, unenc_fx, by = "name")
+leafly_unenc <- distinct(leafly_unenc)
+leafly_unenc <- left_join(leafly_unenc, leafly__unenc_flav, by = "name")
+leafly_unenc <- distinct(leafly_unenc)
+leafly_unenc <- left_join(leafly_unenc, parents_unenc, by = "name")
+leafly_unenc <- distinct(leafly_unenc)
+leafly_unenc <- left_join(leafly_unenc, loc_unenc, by = "name")
+leafly_unenc <- distinct(leafly_unenc)
+
+#create a popularity variable from number_reviews and review
+leafly_unenc$popularity <- as.numeric(leafly_unenc$number_reviews)*as.numeric(leafly_unenc$review)
+
+#EDA for leafly_unenc#
+qplot(data = leafly_unenc, x = neg_1)
+qplot(data = leafly_unenc, x = neg_2)
+qplot(data = leafly_unenc, x = neg_3)
+qplot(data = leafly_unenc, x = neg_4)
+qplot(data = leafly_unenc, x = neg_5)
+qplot(data = leafly_unenc, x = med_1)
+qplot(data = leafly_unenc, x = med_2)
+qplot(data = leafly_unenc, x = med_3)
+qplot(data = leafly_unenc, x = med_4)
+qplot(data = leafly_unenc, x = med_5)
+qplot(data = leafly_unenc, x = fx_1)
+qplot(data = leafly_unenc, x = fx_2)
+qplot(data = leafly_unenc, x = fx_3)
+qplot(data = leafly_unenc, x = fx_4)
+qplot(data = leafly_unenc, x = fx_5)
+qplot(data = leafly_unenc, x = flavor_1)
+qplot(data = leafly_unenc, x = flavor_2)
+qplot(data = leafly_unenc, x = flavor_3)
+qplot(data = leafly_unenc, x = p1)
+qplot(data = leafly_unenc, x = p2)
+qplot(data = leafly_unenc, x = p3)
+qplot(data = leafly_unenc, x = p4)
+qplot(data = leafly_unenc, x = p5)
+qplot(data = leafly_unenc, x = p6)
+qplot(data = leafly_unenc, x = p7)
+qplot(data = leafly_unenc, x = L1)
+qplot(data = leafly_unenc, x = L2)
+qplot(data = leafly_unenc, x = L3)
+qplot(data = leafly_unenc, x = L4)
+qplot(data = leafly_unenc, x = L5)
+qplot(data = leafly_unenc, x = L6)
+qplot(data = leafly_unenc, x = L7)
+qplot(data = leafly_unenc, x = L8)
+qplot(data = leafly_unenc, x = L9)
+qplot(data = leafly_unenc, x = L10)
+qplot(data = leafly_unenc, x = L11)
+qplot(data = leafly_unenc, x = popularity)
+### the fact that L11 and p7 each have only one strain, 
+###tells me they are probably insignificant variables 
+###(the same is also possibly true of p5 & p6, 
+### each with 3 strains only)
+
+#put all effect categories together in one graph
+library(gridExtra)
+n1 <- qplot(data = leafly_unenc, x = neg_1)
+n2 <- qplot(data = leafly_unenc, x = neg_2)
+n3 <- qplot(data = leafly_unenc, x = neg_3)
+n4 <- qplot(data = leafly_unenc, x = neg_4)
+n5 <- qplot(data = leafly_unenc, x = neg_5)
+
+grid.arrange(n1, n2, n3, n4, n5, ncol=5)
+
+fx1 <- qplot(data = leafly_unenc, x = fx_1)
+fx2 <- qplot(data = leafly_unenc, x = fx_2)
+fx3 <- qplot(data = leafly_unenc, x = fx_3)
+fx4 <- qplot(data = leafly_unenc, x = fx_4)
+fx5 <- qplot(data = leafly_unenc, x = fx_5)  
+
+grid.arrange(fx1, fx2, fx3, fx4, fx5, ncol=1)  
+
+m1 <- qplot(data = leafly_unenc, x = med_1)
+m2 <- qplot(data = leafly_unenc, x = med_2)
+m3 <- qplot(data = leafly_unenc, x = med_3)
+m4 <- qplot(data = leafly_unenc, x = med_4)
+m5 <- qplot(data = leafly_unenc, x = med_5)  
+
+grid.arrange(m1, m2, m3, m4, m5, ncol=1)
+
+flv1 <- qplot(data = leafly_unenc, x = flavor_1)
+flv2 <- qplot(data = leafly_unenc, x = flavor_2)
+flv3 <- qplot(data = leafly_unenc, x = flavor_3)
+
+grid.arrange(flv1, flv2, flv3, ncol = 1)
+
+pnt1 <- qplot(data = leafly_unenc, x = p1)
+pnt2 <- qplot(data = leafly_unenc, x = p2)
+pnt3 <- qplot(data = leafly_unenc, x = p3)
+pnt4 <- qplot(data = leafly_unenc, x = p4)
+pnt5 <- qplot(data = leafly_unenc, x = p5)
+pnt6 <- qplot(data = leafly_unenc, x = p6)
+pnt7 <- qplot(data = leafly_unenc, x = p7)
+
+grid.arrange(pnt1, pnt2, pnt3, pnt4, pnt5, pnt6, pnt7, ncol = 1)
+
+loc1 <- qplot(data = leafly_unenc, x = L1)
+loc2 <- qplot(data = leafly_unenc, x = L2)
+loc3 <- qplot(data = leafly_unenc, x = L3)
+loc4 <- qplot(data = leafly_unenc, x = L4)
+loc5 <- qplot(data = leafly_unenc, x = L5)
+loc6 <- qplot(data = leafly_unenc, x = L6)
+loc7 <- qplot(data = leafly_unenc, x = L7)
+loc8 <- qplot(data = leafly_unenc, x = L8)
+loc9 <- qplot(data = leafly_unenc, x = L9)
+loc10 <- qplot(data = leafly_unenc, x = L10)
+loc11 <- qplot(data = leafly_unenc, x = L11)
+
+grid.arrange(loc1, loc2, loc3, loc4, loc5, loc6, loc7, loc8, loc9, loc10, loc11, ncol = 1)
