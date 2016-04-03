@@ -6,7 +6,7 @@ library(tidyr)
 library(stringr)
 library(plyr)
 library(gtools)
-dataFolder <- "<your file path here"
+dataFolder <- "<your file path here."
 
 #load data gathered related to my capstone project
 allprices <- read_excel(paste0(dataFolder, "all_prices.xlsx"))
@@ -489,7 +489,6 @@ leafly$review <- NULL
 names(leafly[,order(colnames(leafly),decreasing=TRUE)])
 #since fx_Headache and fx_Headaches are similar, merge both into fx_Headaches
 leafly$fx_Headaches <- leafly$fx_Headache + leafly$fx_Headaches
-leafly$fx_Headaches
 leafly$fx_Headache <- NULL
 
 #####EDA#####
@@ -647,8 +646,6 @@ names(t_allconditions) <- as.vector(allconditions_tran$condition)
 #remove first row from allconditions (since it is really the label for each column)
 t_allconditions <- t_allconditions[-1,]
 
-#####one hot encoding for conditions for each strain####
-#execute these steps for each condition 
 strains <- list() #create an empty list
 for (i in 1:nrow(allconditions_tran)){
   this_strains <- unique(t_allconditions[,i]) #remove repeat strains for each condition
@@ -691,49 +688,9 @@ leafly_unenc <- distinct(leafly_unenc)
 leafly_unenc$popularity <- as.numeric(leafly_unenc$number_reviews)*as.numeric(leafly_unenc$review)
 
 #EDA for leafly_unenc#
-qplot(data = leafly_unenc, x = neg_1)
-qplot(data = leafly_unenc, x = neg_2)
-qplot(data = leafly_unenc, x = neg_3)
-qplot(data = leafly_unenc, x = neg_4)
-qplot(data = leafly_unenc, x = neg_5)
-qplot(data = leafly_unenc, x = med_1)
-qplot(data = leafly_unenc, x = med_2)
-qplot(data = leafly_unenc, x = med_3)
-qplot(data = leafly_unenc, x = med_4)
-qplot(data = leafly_unenc, x = med_5)
-qplot(data = leafly_unenc, x = fx_1)
-qplot(data = leafly_unenc, x = fx_2)
-qplot(data = leafly_unenc, x = fx_3)
-qplot(data = leafly_unenc, x = fx_4)
-qplot(data = leafly_unenc, x = fx_5)
-qplot(data = leafly_unenc, x = flavor_1)
-qplot(data = leafly_unenc, x = flavor_2)
-qplot(data = leafly_unenc, x = flavor_3)
-qplot(data = leafly_unenc, x = p1)
-qplot(data = leafly_unenc, x = p2)
-qplot(data = leafly_unenc, x = p3)
-qplot(data = leafly_unenc, x = p4)
-qplot(data = leafly_unenc, x = p5)
-qplot(data = leafly_unenc, x = p6)
-qplot(data = leafly_unenc, x = p7)
-qplot(data = leafly_unenc, x = L1)
-qplot(data = leafly_unenc, x = L2)
-qplot(data = leafly_unenc, x = L3)
-qplot(data = leafly_unenc, x = L4)
-qplot(data = leafly_unenc, x = L5)
-qplot(data = leafly_unenc, x = L6)
-qplot(data = leafly_unenc, x = L7)
-qplot(data = leafly_unenc, x = L8)
-qplot(data = leafly_unenc, x = L9)
-qplot(data = leafly_unenc, x = L10)
-qplot(data = leafly_unenc, x = L11)
 qplot(data = leafly_unenc, x = popularity)
-### the fact that L11 and p7 each have only one strain, 
-###tells me they are probably insignificant variables 
-###(the same is also possibly true of p5 & p6, 
-### each with 3 strains only)
 
-#put all effect categories together in one graph
+#put all effect category variables together in one graph
 library(gridExtra)
 n1 <- qplot(data = leafly_unenc, x = neg_1)
 n2 <- qplot(data = leafly_unenc, x = neg_2)
@@ -788,3 +745,178 @@ loc10 <- qplot(data = leafly_unenc, x = L10)
 loc11 <- qplot(data = leafly_unenc, x = L11)
 
 grid.arrange(loc1, loc2, loc3, loc4, loc5, loc6, loc7, loc8, loc9, loc10, loc11, ncol = 1)
+
+leafly_unenc$strain.type <- str_to_lower(leafly_unenc$strain.type)
+qplot(data = leafly_unenc, x = strain.type)
+### the fact that L11 and p7 each have only one strain, 
+###tells me they are probably insignificant variables 
+###(the same is also possibly true of p5 & p6, 
+### each with 3 strains only)
+
+###see if any of the condition - strain from the list have any strains in common with medical effects
+by(select(leafly_unenc, X1:X40), leafly_unenc$med_1, summary)
+by(select(leafly_unenc, X1:X40), leafly_unenc$med_2, summary)
+by(select(leafly_unenc, X1:X40), leafly_unenc$med_3, summary)
+by(select(leafly_unenc, X1:X40), leafly_unenc$med_4, summary)
+by(select(leafly_unenc, X1:X40), leafly_unenc$med_5, summary)
+
+#create a box & whisker plot popularity statistics for the different values of neg_1:neg_5
+qplot(data = subset(leafly_unenc, !is.na(neg_1)), x = neg_1, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,1000))
+
+qplot(data = subset(leafly_unenc, !is.na(neg_2)), x = neg_2, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,1000))
+
+qplot(data = subset(leafly_unenc, !is.na(neg_3)), x = neg_3, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,1000))
+
+qplot(data = subset(leafly_unenc, !is.na(neg_4)), x = neg_4, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,1000))
+
+qplot(data = subset(leafly_unenc, !is.na(neg_5)), x = neg_5, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,1000))  #this appears like if a strain has a serious negative 
+#like headaches or paranoia as the last negative, then that strain's popularity will be 
+#much better (likely because it is not such a strong negative)
+
+#create a box & whisker plot popularity statistics for the different values of fx_1:fx_5
+qplot(data = subset(leafly_unenc, !is.na(fx_1)), x = fx_1, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,600))
+
+qplot(data = subset(leafly_unenc, !is.na(fx_2)), x = fx_2, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,600))
+
+qplot(data = subset(leafly_unenc, !is.na(fx_3)), x = fx_3, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,600))
+
+qplot(data = subset(leafly_unenc, !is.na(fx_4)), x = fx_4, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,600))
+
+qplot(data = subset(leafly_unenc, !is.na(fx_5)), x = fx_5, y = popularity,
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,600))
+
+#look at each variable's effect on popularity#
+names(leafly)
+
+####create a popularity boxplot for each variable in leafly#####
+#separating the images into the different categories of variables#
+library(reshape2)
+#flavors
+leafly_flavors <- select(leafly, flvr_Sweet:flvr_mint, popularity)
+manip <- subset(leafly_flavors, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+#negatives
+leafly_negs <- select(leafly, neg_DryMouth:neg_Anxious, popularity)
+manip <- subset(leafly_negs, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+#effects(general)
+leafly_effects <- select(leafly, fx_Relaxed:fx_Nausea, popularity)
+manip <- subset(leafly_effects, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+#medical effects
+leafly_medical <- select(leafly, med_Stress:med_Paranoid, popularity)
+manip <- subset(leafly_medical, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+#parents
+leafly_parents <- select(leafly, prnts_Afghani:prnts_Bay.11, popularity)
+manip <- subset(leafly_parents, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 41) + ylim(0, quantile(mmanip$popularity, 0.95))
+#types of strains
+leafly_types <- select(leafly, type_indica:type_edible, popularity)
+manip <- subset(leafly_types, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+#popular locations
+leafly_locations <- select(leafly, loc_Toronto:loc_Hermosa..Beach, popularity)
+manip <- subset(leafly_locations, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 42) + ylim(0, quantile(mmanip$popularity, 0.95))
+#medical conditions
+leafly_conditions <- select(leafly, 948:987, popularity)
+manip <- subset(leafly_conditions, !is.na(popularity)) 
+mmanip <- melt(manip, id.vars = "popularity")
+str(mmanip)
+mmanip <- subset(mmanip, value == 1)
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.975))
+
+table(leafly$popularity)
+
+#add up all the strains for each variable (except popularity
+names(leafly)
+sumleafly <-select(leafly, -1, -2, -popularity)
+leaflycounts <- t(apply(sumleafly, 2, sum))
+
+#add up all the variables for each strain
+t_leafly <- data.frame(t(sumleafly))
+names(t_leafly) <- as.character(leafly$name)
+straincounts <- t(apply(t_leafly, 2, sum))
+leafly$straincounts <- t(straincounts)
+leafly$straincounts
+##correlation####
+cor.test(leafly$popularity, leafly$straincounts)
+cor.test(leafly$med_Stress, leafly$med_Pain, method = "kendall")
+cor.test(leafly$med_Pain, leafly$med_Nausea, method = "kendall")
+cor.test(leafly$med_Anxious, leafly$`cnd_ Anxiety`, method = "kendall")
+cor.test(leafly$neg_Dizzy, leafly$type_indica, method = "kendall")
+cor.test(leafly$neg_Paranoid, leafly$type_sativa)
+cor.test(leafly$`cnd_ Anxiety`, leafly$`cnd_ Gastrointestinal Disorder`, method = "kendall")
+cor.test(leafly$`cnd_ Anxiety`, leafly$`cnd_ Epilepsy`, method = "kendall")
+cor.test(leafly$`cnd_ Anxiety`, leafly$`cnd_ Spasticity`, method = "kendall")
+cor.test(leafly$`cnd_ Muscle Spasms`, leafly$`cnd_ Spasticity`, method = "kendall")
+cor.test(leafly$neg_DryMouth, leafly$fx_Dry.Mouth, method = "kendall")
+cor.test(leafly$fx_Dry.Mouth, leafly$med_DryMouth, method = "kendall")
+cor.test(leafly$neg_DryMouth, leafly$fx_Dry.Mouth, method = "kendall")
+### looks like the top strains for the top conditions (by popular strains) are just the same strains
+
+##create a correlation matrix 
+install.packages("corrplot")
+library(corrplot)
+names(leafly)
+#normalize popularity variable & straincounts variable
+mean(!is.na(leafly$popularity))
+sd(!is.na(leafly$popularity))
+leafly$popularity <- (leafly$popularity - mean(!is.na(leafly$popularity)))/(sd(!is.na(leafly$popularity)))
+CL <- (cor(select(leafly, 3:987)))
+
+corrplot(CL, method = "color", type = "upper")
+
+##create a heat map
+#melt leafly data into long format
+leafly_long <- melt(as.matrix(leafly))
+names(leafly_long) <- c("strain", "quality", "value")
+
+#filter out rows that don't contain categorical numeric data
+leafly_long_filter <- leafly_long[!grepl("[A-Za-z]", leafly_long$value),]
+
+#create a heatmap
+ggplot(aes(y = quality, x = strain, fill = value), data = leafly_long_filter) +
+  geom_tile() 
+###
