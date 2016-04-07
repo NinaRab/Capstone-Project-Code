@@ -1009,14 +1009,17 @@ LeaflySelect <- select(leafly, - name)
 split <- sample.split(LeaflySelect$med_Stress, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 LeaflyStress <- rpart(med_Stress ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(LeaflyStress)
 
 #test classification tree model on test data
 predictStress <- predict(LeaflyStress, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Stress, predictStress)
-(72 + 397)/(72 + 397 + 16 + 42)
+acc <- table(test$med_Stress, predictStress)
+sum(diag(acc))/sum(acc)
+
 #about 89% accuracy
 
 library(ROCR)
@@ -1037,14 +1040,16 @@ count(leafly$med_Stress == 1)
 split <- sample.split(LeaflySelect$med_Pain, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 PainTree <- rpart(med_Pain ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(PainTree)
 
 #test classification tree model on test data
 predictPain <- predict(PainTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Pain, predictPain)
-(86 + 342)/(86 + 342 + 25 + 74)
+acc <- table(test$med_Pain, predictPain)
+sum(diag(acc))/sum(acc)
 #about 81% accuracy
 
 library(ROCR)
@@ -1063,14 +1068,17 @@ count(leafly$med_Pain == 1)
 split <- sample.split(LeaflySelect$med_Nausea, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 NauseaTree <- rpart(med_Nausea ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(NauseaTree)
 
 #test classification tree model on test data
 predictNausea <- predict(NauseaTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Nausea, predictNausea)
-(381 + 43)/(381 + 43 + 82 + 22)
+acc <- table(test$med_Nausea, predictNausea)
+sum(diag(acc))/sum(acc)
+
 #about 80% accuracy
 
 predictROCNausea <- predict(NauseaTree, newdata = test)
@@ -1089,14 +1097,17 @@ count(leafly$med_Nausea == 1)
 split <- sample.split(LeaflySelect$med_MuscleSpasms, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 SpasmsTree <- rpart(med_MuscleSpasms ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(SpasmsTree)
 
 #test classification tree model on test data
 predictSpasms <- predict(SpasmsTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_MuscleSpasms, predictSpasms)
-(411 + 31)/(411 + 31 + 60 + 26)
+acc <- table(test$med_MuscleSpasms, predictSpasms)
+sum(diag(acc))/sum(acc)
+
 #about 84% accuracy
 
 predictROCSpasms <- predict(SpasmsTree, newdata = test)
@@ -1115,14 +1126,17 @@ count(leafly$med_MuscleSpasms == 1)
 split <- sample.split(LeaflySelect$med_LackofAppetite, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 LappetiteTree <- rpart(med_LackofAppetite ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(LappetiteTree)
 
 #test classification tree model on test data
 predictLappetite <- predict(LappetiteTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_LackofAppetite, predictLappetite)
-(343 + 81)/(343 + 81 + 91 + 13)
+acc <- table(test$med_LackofAppetite, predictLappetite)
+sum(diag(acc))/sum(acc)
+
 #about 80% accuracy
 
 predictROCLappetite <- predict(LappetiteTree, newdata = test)
@@ -1141,14 +1155,17 @@ count(leafly$med_LackofAppetite == 1)
 split <- sample.split(LeaflySelect$med_Insomnia, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 InsomniaTree <- rpart(med_Insomnia ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(InsomniaTree)
 
 #test classification tree model on test data
 predictInsomnia <- predict(InsomniaTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Insomnia, predictInsomnia)
-(237 + 161)/(237 + 161 + 73 + 57)
+acc <- table(test$med_Insomnia, predictInsomnia)
+sum(diag(acc))/sum(acc)
+
 #about 75% accuracy
 
 predictROCInsomnia <- predict(InsomniaTree, newdata = test)
@@ -1167,14 +1184,17 @@ count(leafly$med_Insomnia == 1)
 split <- sample.split(LeaflySelect$med_Depression, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 DepressionTree <- rpart(med_Depression ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(DepressionTree)
 
 #test classification tree model on test data
 predictDepression <- predict(DepressionTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Depression, predictDepression)
-(96 + 338)/(96 + 338 + 32 + 61)
+acc <- table(test$med_Depression, predictDepression)
+sum(diag(acc))/sum(acc)
+
 #about 82% accuracy
 
 predictROCDeression <- predict(DepressionTree, newdata = test)
@@ -1193,14 +1213,17 @@ count(leafly$med_Depression == 1)
 split <- sample.split(LeaflySelect$med_Headaches, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 HeadacheTree <- rpart(med_Headaches ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(HeadacheTree)
 
 #test classification tree model on test data
 predictHeadache <- predict(HeadacheTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Headaches, predictHeadache)
-(350 + 72)/(350 + 72 + 71 + 35)
+acc <- table(test$med_Headaches, predictHeadache)
+sum(diag(acc))/sum(acc)
+
 #about 80% accuracy
 
 predictROCHeadaches <- predict(HeadacheTree, newdata = test)
@@ -1219,14 +1242,17 @@ count(leafly$med_Headaches == 1)
 split <- sample.split(LeaflySelect$med_Fatigue, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 FatigueTree <- rpart(med_Fatigue ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(FatigueTree)
 
 #test classification tree model on test data
 predictFatigue <- predict(FatigueTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Fatigue, predictFatigue)
-(317 + 64)/(317 + 64 + 97 + 50)
+acc <- table(test$med_Fatigue, predictFatigue)
+sum(diag(acc))/sum(acc)
+
 #about 72% accuracy
 
 predictROCFatigue <- predict(FatigueTree, newdata = test)
@@ -1245,14 +1271,16 @@ count(leafly$med_Fatigue == 1)
 split <- sample.split(LeaflySelect$med_Seizures, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 SeizuresTree <- rpart(med_Seizures ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(SeizuresTree)
 
 #test classification tree model on test data
 predictSeizures <- predict(SeizuresTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Seizures, predictSeizures)
-(521)/(521 + 7)
+acc <- table(test$med_Seizures, predictSeizures)
+sum(diag(acc))/sum(acc)
 #about 99% accuracy (guessing 0 for seizures, anyway)
 
 predictROCSeizures <- predict(SeizuresTree, newdata = test)
@@ -1271,14 +1299,16 @@ count(leafly$med_Seizures == 1)
 split <- sample.split(LeaflySelect$med_Cramps, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 CrampsTree <- rpart(med_Cramps ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(CrampsTree)
 
 #test classification tree model on test data
 predictCramps <- predict(CrampsTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Cramps, predictCramps)
-(492)/(492 + 35)
+acc <- table(test$med_Cramps, predictCramps)
+sum(diag(acc))/sum(acc)
 #about 93% accuracy (just guessing 0 for cramps)
 
 predictROCCramps <- predict(CrampsTree, newdata = test)
@@ -1298,14 +1328,16 @@ count(leafly$med_Cramps == 1)
 split <- sample.split(LeaflySelect$med_Inflammation, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 InflammationTree <- rpart(med_Inflammation ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(InflammationTree)
 
 #test classification tree model on test data
 predictInflammation <- predict(InflammationTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Inflammation, predictInflammation)
-(467)/(467 + 61)
+acc <- table(test$med_Inflammation, predictInflammation)
+sum(diag(acc))/sum(acc)
 #about 88% accuracy
 
 predictROCInflammation <- predict(InflammationTree, newdata = test)
@@ -1324,14 +1356,16 @@ count(leafly$med_Inflammation == 1)
 split <- sample.split(LeaflySelect$med_EyePressure, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 EyePressueTree <- rpart(med_EyePressure ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(EyePressueTree)
 
 #test classification tree model on test data
 predictEyePressure <- predict(EyePressueTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_EyePressure, predictEyePressure)
-(494)/(494 + 34)
+acc <- table(test$med_EyePressure, predictEyePressure)
+sum(diag(acc))/sum(acc)
 #about 94% accuracy
 
 predictROCEyePressure <- predict(EyePressueTree, newdata = test)
@@ -1350,14 +1384,16 @@ count(leafly$med_EyePressure == 1)
 split <- sample.split(LeaflySelect$med_Anxious, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 AnxiousTree <- rpart(med_Anxious ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(AnxiousTree)
 
 #test classification tree model on test data
 predictAnxious<- predict(AnxiousTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Anxious, predictAnxious)
-(527)/(527 + 1)
+acc <- table(test$med_Anxious, predictAnxious)
+sum(diag(acc))/sum(acc)
 #about 100% accuracy (just guessing 0 for Anxious)
 
 predictROCAnxious <- predict(AnxiousTree, newdata = test)
@@ -1377,14 +1413,16 @@ count(leafly$med_Anxious== 1)
 split <- sample.split(LeaflySelect$med_Spasticity, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 SpasticityTree <- rpart(med_Spasticity~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(SpasticityTree)
 
 #test classification tree model on test data
 predictSpasticity <- predict(SpasticityTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Spasticity, predictSpasticity)
-521/(521 + 7)
+acc <- table(test$med_Spasticity, predictSpasticity)
+sum(diag(acc))/sum(acc)
 #about 99% accuracy (just guessing 0 for med_Spasticity)
 
 predictROCSpasticity <- predict(SpasticityTree, newdata = test)
@@ -1403,14 +1441,16 @@ count(leafly$med_Spasticity== 1)
 split <- sample.split(LeaflySelect$med_DryMouth, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 DryMouthTree <- rpart(med_DryMouth ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(DryMouthTree)
 
 #test classification tree model on test data
 predictDryMouth <- predict(DryMouthTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_DryMouth, predictDryMouth)
-525/(525 + 2)
+acc <- table(test$med_DryMouth, predictDryMouth)
+sum(diag(acc))/sum(acc)
 #about 99% accuracy (guessing 0 for dryMouth)
 
 predictROCDryMouth <- predict(DryMouthTree, newdata = test)
@@ -1429,14 +1469,16 @@ count(leafly$med_DryMouth== 1)
 split <- sample.split(LeaflySelect$med_DryEyes, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 DryEyesTree <- rpart(med_DryEyes ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(DryEyesTree)
 
 #test classification tree model on test data
 predictDryEyes <- predict(DryEyesTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_DryEyes, predictDryEyes)
-527/(527 + 1)
+acc <- table(test$med_DryEyes, predictDryEyes)
+sum(diag(acc))/sum(acc)
 #about 100% accuracy guessing 0 for DryEyes
 
 predictROCDryEyes <- predict(DryEyesTree, newdata = test)
@@ -1455,13 +1497,16 @@ count(leafly$med_DryEyes== 1)
 split <- sample.split(LeaflySelect$med_Paranoid, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
+train <- select(train, -c(popularity, straincounts))
+test <- select(test, -c(popularity, straincounts))
 ParanoidTree <- rpart(med_Paranoid ~ ., data = train, method = "class", control = rpart.control(minbucket = 10))
 prp(ParanoidTree)
 
 #test classification tree model on test data
 predictParanoid <- predict(ParanoidTree, newdata = test, type = "class")
 #compute accuracy of predictions
-table(test$med_Paranoid, predictParanoid)
+acc <- table(test$med_Paranoid, predictParanoid)
+sum(diag(acc))/sum(acc)
 #100% accuracy
 
 predictROCParanoid <- predict(ParanoidTree, newdata = test)
