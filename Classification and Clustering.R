@@ -682,59 +682,59 @@ qplot(data = leafly_unenc, x = popularity)
 
 #put all effect category variables together in one graph
 library(gridExtra)
-n1 <- qplot(data = leafly_unenc, x = neg_1)
-n2 <- qplot(data = leafly_unenc, x = neg_2)
-n3 <- qplot(data = leafly_unenc, x = neg_3)
-n4 <- qplot(data = leafly_unenc, x = neg_4)
-n5 <- qplot(data = leafly_unenc, x = neg_5)
+n1 <- qplot(data = leafly_unenc, x = neg_1)  + theme(axis.text.x = element_text(angle = 90, hjust = 0))
+n2 <- qplot(data = leafly_unenc, x = neg_2)  + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+n3 <- qplot(data = leafly_unenc, x = neg_3)  + theme(axis.text.x = element_text(angle = 90, hjust = 0))
+n4 <- qplot(data = leafly_unenc, x = neg_4)  + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+n5 <- qplot(data = leafly_unenc, x = neg_5)  + theme(axis.text.x = element_text(angle = 90, hjust = 0))
 
-grid.arrange(n1, n2, n3, n4, n5, ncol=5)
+grid.arrange(n1, n2, n3, n4, n5, ncol=2)
 
-fx1 <- qplot(data = leafly_unenc, x = fx_1)
-fx2 <- qplot(data = leafly_unenc, x = fx_2)
-fx3 <- qplot(data = leafly_unenc, x = fx_3)
-fx4 <- qplot(data = leafly_unenc, x = fx_4)
-fx5 <- qplot(data = leafly_unenc, x = fx_5)  
+fx1 <- qplot(data = leafly_unenc, x = fx_1) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+fx2 <- qplot(data = leafly_unenc, x = fx_2) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+fx3 <- qplot(data = leafly_unenc, x = fx_3) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+fx4 <- qplot(data = leafly_unenc, x = fx_4) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+fx5 <- qplot(data = leafly_unenc, x = fx_5) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 grid.arrange(fx1, fx2, fx3, fx4, fx5, ncol=1)  
 
-m1 <- qplot(data = leafly_unenc, x = med_1)
-m2 <- qplot(data = leafly_unenc, x = med_2)
-m3 <- qplot(data = leafly_unenc, x = med_3)
-m4 <- qplot(data = leafly_unenc, x = med_4)
-m5 <- qplot(data = leafly_unenc, x = med_5)  
+m1 <- qplot(data = leafly_unenc, x = med_1) + theme(axis.text.x = element_text(angle = 30, hjust = 1))
+m2 <- qplot(data = leafly_unenc, x = med_2) + theme(axis.text.x = element_text(angle = 30, hjust = 1))
+m3 <- qplot(data = leafly_unenc, x = med_3) + theme(axis.text.x = element_text(angle = 30, hjust = 1))
+m4 <- qplot(data = leafly_unenc, x = med_4) + theme(axis.text.x = element_text(angle = 30, hjust = 1))
+m5 <- qplot(data = leafly_unenc, x = med_5) + theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 grid.arrange(m1, m2, m3, m4, m5, ncol=1)
 
-flv1 <- qplot(data = leafly_unenc, x = flavor_1)
-flv2 <- qplot(data = leafly_unenc, x = flavor_2)
-flv3 <- qplot(data = leafly_unenc, x = flavor_3)
+flv1 <- qplot(data = leafly_unenc, x = flavor_1) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+flv2 <- qplot(data = leafly_unenc, x = flavor_2) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+flv3 <- qplot(data = leafly_unenc, x = flavor_3) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 grid.arrange(flv1, flv2, flv3, ncol = 1)
 
-pnt1 <- qplot(data = leafly_unenc, x = p1)
-pnt2 <- qplot(data = leafly_unenc, x = p2)
-pnt3 <- qplot(data = leafly_unenc, x = p3)
-pnt4 <- qplot(data = leafly_unenc, x = p4)
-pnt5 <- qplot(data = leafly_unenc, x = p5)
-pnt6 <- qplot(data = leafly_unenc, x = p6)
-pnt7 <- qplot(data = leafly_unenc, x = p7)
+pnt1 <- qplot(data = leafly_unenc, x = p1) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+pnt2 <- qplot(data = leafly_unenc, x = p2) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+pnt3 <- qplot(data = leafly_unenc, x = p3) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+pnt4 <- qplot(data = leafly_unenc, x = p4) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+pnt5 <- qplot(data = leafly_unenc, x = p5) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+pnt6 <- qplot(data = leafly_unenc, x = p6) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+pnt7 <- qplot(data = leafly_unenc, x = p7) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-grid.arrange(pnt1, pnt2, pnt3, pnt4, pnt5, pnt6, pnt7, ncol = 1)
+grid.arrange(pnt1, pnt2, pnt3, pnt4, pnt5, pnt6, ncol = 1)
 
-loc1 <- qplot(data = leafly_unenc, x = L1)
-loc2 <- qplot(data = leafly_unenc, x = L2)
-loc3 <- qplot(data = leafly_unenc, x = L3)
-loc4 <- qplot(data = leafly_unenc, x = L4)
-loc5 <- qplot(data = leafly_unenc, x = L5)
-loc6 <- qplot(data = leafly_unenc, x = L6)
-loc7 <- qplot(data = leafly_unenc, x = L7)
-loc8 <- qplot(data = leafly_unenc, x = L8)
-loc9 <- qplot(data = leafly_unenc, x = L9)
-loc10 <- qplot(data = leafly_unenc, x = L10)
-loc11 <- qplot(data = leafly_unenc, x = L11)
+loc1 <- qplot(data = leafly_unenc, x = L1) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+loc2 <- qplot(data = leafly_unenc, x = L2) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+loc3 <- qplot(data = leafly_unenc, x = L3) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+loc4 <- qplot(data = leafly_unenc, x = L4) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+loc5 <- qplot(data = leafly_unenc, x = L5) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+loc6 <- qplot(data = leafly_unenc, x = L6) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+loc7 <- qplot(data = leafly_unenc, x = L7) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+loc8 <- qplot(data = leafly_unenc, x = L8) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+loc9 <- qplot(data = leafly_unenc, x = L9) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+loc10 <- qplot(data = leafly_unenc, x = L10) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+loc11 <- qplot(data = leafly_unenc, x = L11) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-grid.arrange(loc1, loc2, loc3, loc4, loc5, loc6, loc7, loc8, loc9, loc10, loc11, ncol = 1)
+grid.arrange(loc1, loc2, loc3, loc4, loc5, loc6, loc7, loc8, loc9, loc10, ncol = 1)
 
 leafly_unenc$strain.type <- str_to_lower(leafly_unenc$strain.type)
 qplot(data = leafly_unenc, x = strain.type)
@@ -753,7 +753,7 @@ by(select(leafly_unenc, X1:X40), leafly_unenc$med_5, summary)
 #create a box & whisker plot popularity statistics for the different values of neg_1:neg_5
 qplot(data = subset(leafly_unenc, !is.na(neg_1)), x = neg_1, y = popularity,
       geom = 'boxplot') +
-  coord_cartesian(ylim = c(0,1000))
+  coord_cartesian(ylim = c(0,1000)) 
 
 qplot(data = subset(leafly_unenc, !is.na(neg_2)), x = neg_2, y = popularity,
       geom = 'boxplot') +
@@ -806,35 +806,44 @@ manip <- subset(leafly_flavors, !is.na(popularity))
 mmanip <- melt(manip, id.vars = "popularity")
 str(mmanip)
 mmanip <- subset(mmanip, value == 1)
-ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+ggplot(mmanip, aes(x = value, y = popularity)) + 
+  geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + 
+  ylim(0, quantile(mmanip$popularity, 0.95)) +
+  theme(strip.text.x = element_text(size = 12, angle = 90))
+
 #negatives
 leafly_negs <- select(leafly, neg_DryMouth:neg_Anxious, popularity)
 manip <- subset(leafly_negs, !is.na(popularity)) 
 mmanip <- melt(manip, id.vars = "popularity")
 str(mmanip)
 mmanip <- subset(mmanip, value == 1)
-ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable, labeller = label_wrap_gen(width = 5000, multi_line = TRUE)) + ylim(0, quantile(mmanip$popularity, 0.95)) +
+  theme(strip.text.x = element_text(size = 12, angle = 90))
 #effects(general)
 leafly_effects <- select(leafly, fx_Relaxed:fx_Nausea, popularity)
 manip <- subset(leafly_effects, !is.na(popularity)) 
 mmanip <- melt(manip, id.vars = "popularity")
 str(mmanip)
 mmanip <- subset(mmanip, value == 1)
-ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 20) + ylim(0, quantile(mmanip$popularity, 0.95))+
+  theme(strip.text.x = element_text(size = 12, angle = 90))
 #medical effects
 leafly_medical <- select(leafly, med_Stress:med_Paranoid, popularity)
 manip <- subset(leafly_medical, !is.na(popularity)) 
 mmanip <- melt(manip, id.vars = "popularity")
 str(mmanip)
 mmanip <- subset(mmanip, value == 1)
-ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.95))
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 20) + ylim(0, quantile(mmanip$popularity, 0.95))+
+  theme(strip.text.x = element_text(size = 10, angle = 90))
 #parents
 leafly_parents <- select(leafly, prnts_Afghani:prnts_Bay.11, popularity)
 manip <- subset(leafly_parents, !is.na(popularity)) 
 mmanip <- melt(manip, id.vars = "popularity")
 str(mmanip)
 mmanip <- subset(mmanip, value == 1)
-ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 41) + ylim(0, quantile(mmanip$popularity, 0.95))
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 50) + ylim(0, quantile(mmanip$popularity, 0.75)) +
+  theme(strip.text.x = element_text(size = 8, angle = 90))
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 50) + ylim(0, quantile(mmanip$popularity, 0.75))
 #types of strains
 leafly_types <- select(leafly, type_indica:type_edible, popularity)
 manip <- subset(leafly_types, !is.na(popularity)) 
@@ -848,14 +857,16 @@ manip <- subset(leafly_locations, !is.na(popularity))
 mmanip <- melt(manip, id.vars = "popularity")
 str(mmanip)
 mmanip <- subset(mmanip, value == 1)
-ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 42) + ylim(0, quantile(mmanip$popularity, 0.95))
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 42) + ylim(0, quantile(mmanip$popularity, 0.75)) + +
+  theme(strip.text.x = element_text(size = 8, angle = 90))
 #medical conditions
 leafly_conditions <- select(leafly, 948:987, popularity)
 manip <- subset(leafly_conditions, !is.na(popularity)) 
 mmanip <- melt(manip, id.vars = "popularity")
 str(mmanip)
 mmanip <- subset(mmanip, value == 1)
-ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_grid(.~variable) + ylim(0, quantile(mmanip$popularity, 0.975))
+ggplot(mmanip, aes(x = value, y = popularity)) + geom_boxplot(stat = 'boxplot') + facet_wrap(~variable, ncol = 20) + ylim(0, quantile(mmanip$popularity, 0.95)) +
+  theme(strip.text.x = element_text(size = 10, angle = 90))
 
 table(leafly$popularity)
 
@@ -890,7 +901,7 @@ cor.test(leafly$neg_DryMouth, leafly$fx_Dry.Mouth, method = "kendall")
 library(corrplot)
 names(leafly)
 CL <- (cor(select(leafly, 3:987)))
-corr.matrix <- corrplot(CL, method = "color", type = "upper")
+corr.matrix <- corrplot(CL, method = "color", type = "lower")
 
 #select leafly fx and types and create correlation matrix
 leafly_fx_type <- select(leafly, 56:81, type_indica:type_edible)
@@ -1019,8 +1030,7 @@ predictStress <- predict(LeaflyStress, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Stress, predictStress)
 sum(diag(acc))/sum(acc)
-
-#about 89% accuracy
+#about 91% accuracy
 
 library(ROCR)
 predictROCStress <- predict(LeaflyStress, newdata = test)
@@ -1050,7 +1060,7 @@ predictPain <- predict(PainTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Pain, predictPain)
 sum(diag(acc))/sum(acc)
-#about 81% accuracy
+#about 83% accuracy
 
 library(ROCR)
 predictROCPain <- predict(PainTree, newdata = test)
@@ -1065,6 +1075,7 @@ count(leafly$med_Pain == 1)
 1225/(1225 + 534)
 #classification tree for med_Stress is more than 10% better than always guessing 1 for med_Stress on all leafly data
 
+#med_Nausea
 split <- sample.split(LeaflySelect$med_Nausea, SplitRatio = .7)
 train <- subset(LeaflySelect, split == TRUE)
 test <- subset(LeaflySelect, split == FALSE)
@@ -1078,8 +1089,7 @@ predictNausea <- predict(NauseaTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Nausea, predictNausea)
 sum(diag(acc))/sum(acc)
-
-#about 80% accuracy
+#about 78% accuracy
 
 predictROCNausea <- predict(NauseaTree, newdata = test)
 predictROCNausea
@@ -1107,8 +1117,7 @@ predictSpasms <- predict(SpasmsTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_MuscleSpasms, predictSpasms)
 sum(diag(acc))/sum(acc)
-
-#about 84% accuracy
+#about 82% accuracy
 
 predictROCSpasms <- predict(SpasmsTree, newdata = test)
 predictROCSpasms
@@ -1136,8 +1145,7 @@ predictLappetite <- predict(LappetiteTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_LackofAppetite, predictLappetite)
 sum(diag(acc))/sum(acc)
-
-#about 80% accuracy
+#about 74% accuracy
 
 predictROCLappetite <- predict(LappetiteTree, newdata = test)
 predictROCLappetite
@@ -1165,13 +1173,12 @@ predictInsomnia <- predict(InsomniaTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Insomnia, predictInsomnia)
 sum(diag(acc))/sum(acc)
-
-#about 75% accuracy
+#about 78% accuracy
 
 predictROCInsomnia <- predict(InsomniaTree, newdata = test)
 predictROCInsomnia
 
-#compute ROC curve for NauseaTree
+#compute ROC curve
 predInsomnia <- prediction(predictROCInsomnia [,2], test$med_Insomnia)
 perf <- performance(predInsomnia, "tpr", "fpr")
 plot(perf)
@@ -1194,7 +1201,6 @@ predictDepression <- predict(DepressionTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Depression, predictDepression)
 sum(diag(acc))/sum(acc)
-
 #about 82% accuracy
 
 predictROCDeression <- predict(DepressionTree, newdata = test)
@@ -1223,8 +1229,7 @@ predictHeadache <- predict(HeadacheTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Headaches, predictHeadache)
 sum(diag(acc))/sum(acc)
-
-#about 80% accuracy
+#about 79% accuracy
 
 predictROCHeadaches <- predict(HeadacheTree, newdata = test)
 predictROCHeadaches
@@ -1252,8 +1257,7 @@ predictFatigue <- predict(FatigueTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Fatigue, predictFatigue)
 sum(diag(acc))/sum(acc)
-
-#about 72% accuracy
+#about 74% accuracy
 
 predictROCFatigue <- predict(FatigueTree, newdata = test)
 predictROCFatigue
@@ -1309,7 +1313,7 @@ predictCramps <- predict(CrampsTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_Cramps, predictCramps)
 sum(diag(acc))/sum(acc)
-#about 93% accuracy (just guessing 0 for cramps)
+#about 94% accuracy
 
 predictROCCramps <- predict(CrampsTree, newdata = test)
 predictROCCramps
@@ -1451,7 +1455,7 @@ predictDryMouth <- predict(DryMouthTree, newdata = test, type = "class")
 #compute accuracy of predictions
 acc <- table(test$med_DryMouth, predictDryMouth)
 sum(diag(acc))/sum(acc)
-#about 99% accuracy (guessing 0 for dryMouth)
+#about 99.6% accuracy (guessing 0 for dryMouth)
 
 predictROCDryMouth <- predict(DryMouthTree, newdata = test)
 predictROCDryMouth
