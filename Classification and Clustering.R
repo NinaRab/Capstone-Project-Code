@@ -1,6 +1,5 @@
 #load libraries, set dataFolder
 library(ggplot2)
-library(readxl)
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -9,7 +8,6 @@ library(gtools)
 dataFolder <- "<your file path here>"
 
 #load data gathered related to my capstone project
-allprices <- read_excel(paste0(dataFolder, "all_prices.xlsx"))
 leafly1 <- read.csv(paste0(dataFolder, "leafly_1.csv"))
 leafly1761 <- read.csv(paste0(dataFolder, "leafly_1761.csv"))
 conditions <- read.csv(paste0(dataFolder, "conditions_strains.csv"))
