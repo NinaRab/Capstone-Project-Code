@@ -1016,8 +1016,8 @@ prp(LeaflyStress)
 predictStress <- predict(LeaflyStress, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Stress, predictStress)
-(70 + 392)/(70 + 392 + 21 + 44)
-#about 87% accuracy
+(72 + 397)/(72 + 397 + 16 + 42)
+#about 89% accuracy
 
 library(ROCR)
 predictROCStress <- predict(LeaflyStress, newdata = test)
@@ -1044,8 +1044,8 @@ prp(PainTree)
 predictPain <- predict(PainTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Pain, predictPain)
-(97 + 319)/(97 + 319 + 48 + 63)
-#about 79% accuracy
+(86 + 342)/(86 + 342 + 25 + 74)
+#about 81% accuracy
 
 library(ROCR)
 predictROCPain <- predict(PainTree, newdata = test)
@@ -1070,8 +1070,8 @@ prp(NauseaTree)
 predictNausea <- predict(NauseaTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Nausea, predictNausea)
-(362 + 54)/(362 + 54 + 71 + 41)
-#about 79% accuracy
+(381 + 43)/(381 + 43 + 82 + 22)
+#about 80% accuracy
 
 predictROCNausea <- predict(NauseaTree, newdata = test)
 predictROCNausea
@@ -1096,8 +1096,8 @@ prp(SpasmsTree)
 predictSpasms <- predict(SpasmsTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_MuscleSpasms, predictSpasms)
-(405 + 27)/(405 + 27 + 64 + 32)
-#about 82% accuracy
+(411 + 31)/(411 + 31 + 60 + 26)
+#about 84% accuracy
 
 predictROCSpasms <- predict(SpasmsTree, newdata = test)
 predictROCSpasms
@@ -1109,7 +1109,7 @@ plot(perf)
 #compute baseline true positive rate as percentage of strains that are good for stress
 count(leafly$med_MuscleSpasms == 1)
 1456/(1456 + 303)
-#about 82% accuracy just guessing 0 for muscle spasms
+#about 83% accuracy just guessing 0 for muscle spasms
 
 #med_lackofAppetite
 split <- sample.split(LeaflySelect$med_LackofAppetite, SplitRatio = .7)
@@ -1122,7 +1122,7 @@ prp(LappetiteTree)
 predictLappetite <- predict(LappetiteTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_LackofAppetite, predictLappetite)
-(333 + 87)/(333 + 87 + 85 + 23)
+(343 + 81)/(343 + 81 + 91 + 13)
 #about 80% accuracy
 
 predictROCLappetite <- predict(LappetiteTree, newdata = test)
@@ -1148,8 +1148,8 @@ prp(InsomniaTree)
 predictInsomnia <- predict(InsomniaTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Insomnia, predictInsomnia)
-(236 + 156)/(236 + 156 + 78 + 58)
-#about 74% accuracy
+(237 + 161)/(237 + 161 + 73 + 57)
+#about 75% accuracy
 
 predictROCInsomnia <- predict(InsomniaTree, newdata = test)
 predictROCInsomnia
@@ -1174,7 +1174,7 @@ prp(DepressionTree)
 predictDepression <- predict(DepressionTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Depression, predictDepression)
-(86 + 344)/(86 + 344 + 26 + 71)
+(96 + 338)/(96 + 338 + 32 + 61)
 #about 82% accuracy
 
 predictROCDeression <- predict(DepressionTree, newdata = test)
@@ -1200,8 +1200,8 @@ prp(HeadacheTree)
 predictHeadache <- predict(HeadacheTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Headaches, predictHeadache)
-(317 + 82)/(317 + 82 + 61 + 68)
-#about 76% accuracy
+(350 + 72)/(350 + 72 + 71 + 35)
+#about 80% accuracy
 
 predictROCHeadaches <- predict(HeadacheTree, newdata = test)
 predictROCHeadaches
@@ -1226,8 +1226,8 @@ prp(FatigueTree)
 predictFatigue <- predict(FatigueTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Fatigue, predictFatigue)
-(318 + 88)/(318 + 88 + 73 + 49)
-#about 77% accuracy
+(317 + 64)/(317 + 64 + 97 + 50)
+#about 72% accuracy
 
 predictROCFatigue <- predict(FatigueTree, newdata = test)
 predictROCFatigue
@@ -1253,7 +1253,7 @@ predictSeizures <- predict(SeizuresTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Seizures, predictSeizures)
 (521)/(521 + 7)
-#about 99% accuracy
+#about 99% accuracy (guessing 0 for seizures, anyway)
 
 predictROCSeizures <- predict(SeizuresTree, newdata = test)
 predictROCSeizures
@@ -1278,8 +1278,8 @@ prp(CrampsTree)
 predictCramps <- predict(CrampsTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Cramps, predictCramps)
-(491 + 2)/(491 + 2 + 33 + 1)
-#about 94% accuracy
+(492)/(492 + 35)
+#about 93% accuracy (just guessing 0 for cramps)
 
 predictROCCramps <- predict(CrampsTree, newdata = test)
 predictROCCramps
@@ -1331,7 +1331,7 @@ prp(EyePressueTree)
 predictEyePressure <- predict(EyePressueTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_EyePressure, predictEyePressure)
-(491 + 4)/(491 + 4 + 30 + 3)
+(494)/(494 + 34)
 #about 94% accuracy
 
 predictROCEyePressure <- predict(EyePressueTree, newdata = test)
@@ -1358,7 +1358,7 @@ predictAnxious<- predict(AnxiousTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Anxious, predictAnxious)
 (527)/(527 + 1)
-#about 100% accuracy
+#about 100% accuracy (just guessing 0 for Anxious)
 
 predictROCAnxious <- predict(AnxiousTree, newdata = test)
 predictROCAnxious
@@ -1385,7 +1385,7 @@ predictSpasticity <- predict(SpasticityTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_Spasticity, predictSpasticity)
 521/(521 + 7)
-#about 99% accuracy
+#about 99% accuracy (just guessing 0 for med_Spasticity)
 
 predictROCSpasticity <- predict(SpasticityTree, newdata = test)
 predictROCSpasticity
@@ -1397,6 +1397,7 @@ plot(perf)
 #compute baseline true positive rate as percentage of strains that are good for stress
 count(leafly$med_Spasticity== 1)
 1736/(1736 + 23)
+#about 99% accuracy guessing 0 for med_Spasticity
 
 #med_DryMouth
 split <- sample.split(LeaflySelect$med_DryMouth, SplitRatio = .7)
@@ -1410,7 +1411,7 @@ predictDryMouth <- predict(DryMouthTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_DryMouth, predictDryMouth)
 525/(525 + 2)
-#about 99% accuracy
+#about 99% accuracy (guessing 0 for dryMouth)
 
 predictROCDryMouth <- predict(DryMouthTree, newdata = test)
 predictROCDryMouth
@@ -1422,6 +1423,7 @@ plot(perf)
 #compute baseline true positive rate as percentage of strains that are good for stress
 count(leafly$med_DryMouth== 1)
 1751/(1751 + 8)
+#about 100% accuracy guessing 0 for dryMouth
 
 #med_DryEyes
 split <- sample.split(LeaflySelect$med_DryEyes, SplitRatio = .7)
@@ -1435,7 +1437,7 @@ predictDryEyes <- predict(DryEyesTree, newdata = test, type = "class")
 #compute accuracy of predictions
 table(test$med_DryEyes, predictDryEyes)
 527/(527 + 1)
-#about 99% accuracy
+#about 100% accuracy guessing 0 for DryEyes
 
 predictROCDryEyes <- predict(DryEyesTree, newdata = test)
 predictROCDryEyes
@@ -1447,7 +1449,7 @@ plot(perf)
 #compute baseline true positive rate as percentage of strains that are good for stress
 count(leafly$med_DryEyes== 1)
 1755/(1755 + 4)
-
+#about 100% accuracy guessing 0 for DryMouth
 
 #med_Paranoid
 split <- sample.split(LeaflySelect$med_Paranoid, SplitRatio = .7)
@@ -1468,3 +1470,7 @@ predictROCParanoid
 #compute baseline true positive rate as percentage of strains that are good for stress
 count(leafly$med_Paranoid== 1)
 1758/(1758 + 1)
+#almost 100% accuracy guessing 0 for paranoid
+##do not include variables that the tree does not improve over guessing
+## 0 since there are not enough outcomes or cases that show they help 
+##for those symptoms
