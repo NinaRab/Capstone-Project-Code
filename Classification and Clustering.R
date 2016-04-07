@@ -1474,3 +1474,6 @@ count(leafly$med_Paranoid== 1)
 ##do not include variables that the tree does not improve over guessing
 ## 0 since there are not enough outcomes or cases that show they help 
 ##for those symptoms
+###Only include the following medical symptoms:
+###Stress, pain, nausea, muscle spasms, lack of appetite, insomnia, 
+###depression, headaches, and fatigue.
